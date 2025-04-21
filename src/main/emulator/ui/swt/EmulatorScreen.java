@@ -189,6 +189,8 @@ public final class EmulatorScreen implements
 	private int lastPointerY;
 	private boolean paintPending;
 
+	public static final String SHELL_TYPE = "MAIN_WINDOW";
+
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
 		EmulatorScreen.display = EmulatorImpl.getDisplay();
@@ -704,6 +706,7 @@ public final class EmulatorScreen implements
 		this.initMenu();
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.addShellListener(new Class53(this));
+		shell.setData("TYPE", SHELL_TYPE);
 	}
 
 	private void initMenu() {

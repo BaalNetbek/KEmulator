@@ -41,6 +41,9 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	private TreeColumn column2;
 	private TreeColumn column3;
 	private long lastShellResizeEvent;
+	private static final int INIT_WIDTH = 475;
+	private static final int INIT_HEIGHT = 500;
+
 
 	public static final String SHELL_TYPE = "WATCHER";
 
@@ -326,36 +329,69 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 	private void setInitialRect(Shell parent) {
 		// for any maximized parent place at bottom-center
+		String parentType = String.valueOf(parent.getData("TYPE"));
+		int x, y;
 		if (parent.getMaximized()) {
-			shell.setSize(400, 500);
-			int x = parent.getLocation().x + parent.getSize().x / 2 - 200;
-			int y = parent.getLocation().y + parent.getSize().y - 500;
-			shell.setLocation(x, y);
+			switch (parentType) {
+				case EmulatorScreen.SHELL_TYPE: {
+					shell.setSize(INIT_WIDTH, INIT_HEIGHT);
+					x = 0;
+					y = 50; //this should be height of title bar + menu bar
+					shell.setLocation(x, y);
+					break;
+				}
+				default: {
+					shell.setSize(INIT_WIDTH, INIT_HEIGHT);
+					x = parent.getLocation().x + parent.getSize().x / 2 - INIT_WIDTH / 2;
+					y = parent.getLocation().y + parent.getSize().y - INIT_HEIGHT;
+					shell.setLocation(x, y);
+					break;
+				}
+			}
 			return;
 		}
+		Display display = EmulatorImpl.getDisplay();
+		int displayWidth = display.getClientArea().width;
+		int displayHeight = display.getClientArea().height;
 
-		switch (String.valueOf(parent.getData("TYPE"))) {
+		switch (parentType) {
 			case Watcher.SHELL_TYPE: {
 				// parent is watcher
 				shell.setSize(parent.getSize());
-				shell.setLocation(parent.getLocation().x + 40, parent.getLocation().y + 40);
+				x = parent.getLocation().x + 40;
+				y = parent.getLocation().y + 40;
+				if (x + INIT_WIDTH > displayWidth) {
+					x -= 80;
+				}
+				if (y + INIT_HEIGHT > displayHeight) {
+					y -= 80;
+				}
+				shell.setLocation(x, y);
 				break;
 			}
 			case MemoryView.SHELL_TYPE: {
 				// parent is memview
-				shell.setSize(400, 500);
+				shell.setSize(INIT_WIDTH, INIT_HEIGHT);
 				shell.setLocation(parent.getLocation().x + parent.getSize().x + 10, parent.getLocation().y);
 				break;
 			}
 			default: {
 				// parent is main window
-				shell.setSize(400, 500);
-				if (parent.getSize().x < 500 || parent.getSize().y < 600) {
-					shell.setLocation(parent.getLocation().x + parent.getSize().x + 10, parent.getLocation().y);
+				shell.setSize(INIT_WIDTH, INIT_HEIGHT);
+				if (parent.getSize().x < (INIT_WIDTH + 100) || parent.getSize().y < (INIT_HEIGHT + 100)) {
+					x = parent.getLocation().x + parent.getSize().x + 10;
+					y = parent.getLocation().y;
+					if (x + INIT_WIDTH > displayWidth) {
+						x = parent.getLocation().x - INIT_WIDTH;
+					}
+					shell.setLocation(x, y);
 					break;
 				}
-				int x = parent.getLocation().x + parent.getSize().x - 400;
-				int y = parent.getLocation().y + parent.getSize().y - 500;
+				x = parent.getLocation().x + parent.getSize().x - INIT_WIDTH;
+				y = parent.getLocation().y + parent.getSize().y - INIT_HEIGHT;
+				if (x + INIT_WIDTH > displayWidth) {
+					x = parent.getLocation().x - INIT_WIDTH;
+				}
 				shell.setLocation(x, y);
 				break;
 			}
